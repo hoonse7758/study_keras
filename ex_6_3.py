@@ -33,9 +33,13 @@ from matplotlib import pyplot as plt
 # 버전 확인 : 2.0.8
 print(f"keras.__version__ = {keras.__version__}")
 
+
+
 # =========================================== #
 # 6.3.1     A Temperature-Forecasting Problem #
 # =========================================== #
+
+
 
 # 1. 데이터셋 취득 -------------------------------------------------------
 #   0) 경로 설정
@@ -84,6 +88,7 @@ temperature_array = csv_data_array[:, csv_data_header.index('"T (degC)"') - 1]
 plt.plot(range(len(temperature_array)), temperature_array)  # 전체 그림
 plt.plot(range(1440), temperature_array[:1440])             # 첫 14,400분 (첫 10일)까지의 데이터
 # -----------------------------------------------------------------------
+
 
 
 # =============================== #
@@ -143,7 +148,6 @@ def data_generator(
             samples[j] = in_data[indices]
             targets[j] = in_data[rows[j] + delay][1]
         yield samples, targets
-
 
 # ------------------------------------------------------------------------
 
@@ -332,7 +336,6 @@ model.add(layers.GRU(64, activation='relu',
                      dropout=0.1,
                      recurrent_dropout=0.5))
 model.add(layers.Dense(1))
-
 model.compile(optimizer=RMSprop(), loss='mae')
 history = model.fit_generator(generator_train,
                               steps_per_epoch=100,      # 원래 500번, 100 번만 하도록 수정
@@ -358,6 +361,7 @@ plt.show()
 #   *) the Swiss army knife of deep learning for NLP
 #   0) 본래 정의된 정방향 순서와 reverse 된 데이터셋을 둘 다 사용해 보자
 #   1) 적어도 NLP 문제에서만큼은 reverse 된 데이터셋을 쓰더라도 문제가 없다
+#      ( 오히려 새로운 관점의 해석을 보여주기 때문에 모델 성능 향상에 도움이 됨 )
 #   2) 이런 점을 이용해서 양방향으로 학습해 보자
 # -----------------------------------------------------------------------
 
@@ -413,7 +417,7 @@ val_gen_reverse = reverse_order_generator(
 valid_steps = 1000  # Hardcoded     원래 책에서는 98559 번 돌도록 ...
 
 
-# jena 의 기후 데이터셋의 시간 순서를 역순으로 뒤집고 가장 단순한 GRU 1층짜리 모델로 학습 시도
+# 4. jena 의 기후 데이터셋 시간 순서를 역순으로 뒤집고 가장 단순한 GRU 1층짜리 모델로 학습 시도 --------------------
 # 결과 : 본래 순서 데이터를 썼을 때보다 못함
 # 의미 : 시간 순서가 굉장히 중요했던 것이었다
 model = Sequential()
@@ -436,9 +440,9 @@ plt.legend()
 plt.show()
 
 
+# 5. 오랜만에 imdb --------------------------------------------------------------------------------------
 # 여기부터 jena 데이터 안씀
-# 오랜만에 imdb
-# - allow_pickle False 관련 에러날 경우
+# - allow_pickle 이 False 면 저장할 수 없다는 에러가 날 경우
 #   : \site-packages\keras\datasets\imdb.py 의 load_data() 의 52 번째 라인을
 #   : with np.load(path, allow_pickle=True) as f: 로 변경
 
@@ -456,10 +460,10 @@ x_train = sequence.pad_sequences(x_train, maxlen=maxlen)
 x_test = sequence.pad_sequences(x_test, maxlen=maxlen)
 
 
-# 각 문서 내 단어들의 순서가 뒤집힌 imdb 데이터셋에 Recurrent 모델을 사용해 보자
+# 6. 각 문서 내 단어들의 순서가 뒤집힌 imdb 데이터셋에 Recurrent 모델을 사용해 보자 -------------------------------
 # 결과 : word order does matter in understanding language, which order you use isn't crucial.
-# 역순 데이터를 사용하면 기존의 정방향 데이터를 사용했을 때와는 또다른 형식의 표현(해석?)을 볼 수 있다
-# 저자의 말
+# 역순 데이터를 사용하면 기존의 정방향 데이터를 사용했을 때와는 또다른 형식(관점?)의 표현(해석?)을 볼 수 있다
+# [저자의 말]
 # Importantly, a RNN trained on reversed sequences will learn different representations
 # than one trained on the original sequences
 # ... they offer a new angle from which to look at your data,
@@ -489,7 +493,7 @@ plt.legend()
 plt.show()
 
 
-# Bidirectional 모델을 실제로 사용해 보자
+# 7. Bidirectional 모델을 실제로 사용해 보자 ------------------------------------------------------------
 
 # 백엔드 세션 정리
 from keras import backend as K
@@ -514,5 +518,7 @@ plt.plot(epochs, val_loss, 'b', label='Validation loss')
 plt.title('Training and validation loss')
 plt.legend()
 plt.show()
+
+# ----------------------------------------------------------------------------------------------------
 
 print("debug point")

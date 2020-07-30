@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
     # 표현식으로 Generator 생성하기
     generator1 = (obj for obj in [1, 2, 3])
-    print(f"generator1 = {generator1}")     # 타입 확인 - genera
+    print(f"generator1 = {generator1}")     # 타입 확인 - generator 타입
     for generated in generator1:
         print(f"\tgenerated {generated}")
     try:
@@ -22,11 +22,13 @@ if __name__ == '__main__':
 
     # 함수로 Generator 생성하기
     generator2 = simple_generator(10, 20)
+    print(f"generator2 = {generator2}")  # 타입 확인 - generator 타입
     generated: int = 0
-    while generated is not None:
+    is_generated: bool = True
+    while is_generated:
         try:
             generated = next(generator2)
         except StopIteration:
-            generated = None
+            is_generated = False
         finally:
             print(generated)
